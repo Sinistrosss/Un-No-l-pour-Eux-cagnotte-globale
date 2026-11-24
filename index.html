@@ -1,0 +1,67 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: transparent;
+    overflow: hidden;
+  }
+
+  body {
+    font-family: Arial, sans-serif;
+    color: white;
+    font-size: 64px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 2px 2px 5px #000;
+  }
+
+  #montant {
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div id="montant">Chargement...</div>
+
+<script>
+const API = "https://streamlabscharity.com/api/v1/teams/@un-noel-pour-eux/un-noel-pour-eux";
+
+async function actualiserMontant() {
+  const affichage = document.getElementById("montant");
+
+  try {
+    const reponse = await fetch(API, { cache: "no-store" });
+
+    if (!reponse.ok) throw new Error("Erreur API");
+
+    const donnees = await reponse.json();
+
+    if (typeof donnees.amount_raised !== "number") {
+      throw new Error("Montant introuvable");
+    }
+
+    affichage.textContent = new Intl.NumberFormat("fr-FR", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0
+    }).format(donnees.amount_raised);
+
+  } catch (erreur) {
+    console.error(erreur);
+    affichage.textContent = "Montant indisponible";
+  }
+}
+
+actualiserMontant();
+setInterval(actualiserMontant, 30000);
+</script>
+
+</body>
+</html>
